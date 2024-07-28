@@ -4,19 +4,19 @@ import de.littleprogrammer.marketplace.files.DatabaseFile;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-public class Redis {
+public class RedisManager {
     private String host = new DatabaseFile().getString("redis.host");
     private int port = new DatabaseFile().getInt("redis.port");
-    private static Redis instance;
+    private static RedisManager instance;
     private JedisPool jedisPool;
 
-    private Redis() {
+    private RedisManager() {
         jedisPool = new JedisPool(host, port);
     }
 
-    public static Redis getInstance() {
+    public static RedisManager getInstance() {
         if (instance == null) {
-            instance = new Redis();
+            instance = new RedisManager();
         }
         return instance;
     }
