@@ -1,0 +1,6 @@
+mongoDB:
+  uri: ""
+  database: ""
+redis:
+  host: ""
+  port: 6379
