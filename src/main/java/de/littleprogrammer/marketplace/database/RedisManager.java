@@ -4,6 +4,8 @@ import de.littleprogrammer.marketplace.files.DatabaseFile;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.util.List;
+
 public class RedisManager {
     private String host = new DatabaseFile().getString("redis.host");
     private int port = new DatabaseFile().getInt("redis.port");
@@ -43,5 +45,18 @@ public class RedisManager {
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.del(key);
         }
+    }
+
+    public void lpush(String key, String value) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.lpush(key, value);
+        }
+    }
+
+    public List<String> lrange(String key, long start, long end) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.lrange(key, start, end);
+        }
+
     }
 }

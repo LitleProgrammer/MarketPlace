@@ -4,3 +4,13 @@ main: de.littleprogrammer.marketplace.Main
 api-version: '1.20'
 authors: [LittleProgrammer]
 description: Plugin made for DevRoom as a demo
+libraries:
+  - org.mongodb:mongodb-driver-sync:5.1.2
+  - redis.clients:jedis:5.0.0
+commands:
+  sell:
+    description: Lists the item in your hand in the marketplace for sale.
+    permission: marketplace.sell
+  marketplace:
+    description: Displays a list of all items currently for sale in the marketplace.
+    permission: marketplace.view

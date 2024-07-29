@@ -20,7 +20,7 @@ repositories {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT"
     implementation 'redis.clients:jedis:5.0.0'
-    implementation 'org.mongodb:mongodb-driver-sync:5.1.1'
+    implementation 'org.mongodb:mongodb-driver-sync:5.1.2'
 }
 
 def targetJavaVersion = 17
