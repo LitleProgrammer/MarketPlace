@@ -2,6 +2,8 @@ package de.littleprogrammer.marketplace;
 
 import de.littleprogrammer.marketplace.commands.MarketPlaceCommand;
 import de.littleprogrammer.marketplace.commands.SellCommand;
+import de.littleprogrammer.marketplace.listeners.InventoryClickListener;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -19,6 +21,9 @@ public final class Main extends JavaPlugin {
         getCommand("sell").setExecutor(new SellCommand());
         getCommand("marketplace").setExecutor(new MarketPlaceCommand());
 
+        //Listeners
+        Bukkit.getPluginManager().registerEvents(new InventoryClickListener(), this);
+
         //Files
         File databaseConfig = new File(getDataFolder(), "database.yml");
         if (!databaseConfig.exists()) {
@@ -30,6 +35,11 @@ public final class Main extends JavaPlugin {
         if (!configFile.exists()) {
             //File doesn't exist -> creating it from resources
             saveResource("config.yml", false);
+        }
+
+        File langFile = new File(getDataFolder(), "language.yml");
+        if (!langFile.exists()) {
+            saveResource("language.yml", false);
         }
 
     }

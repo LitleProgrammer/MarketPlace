@@ -1,7 +1,8 @@
 package de.littleprogrammer.marketplace.commands;
 
 import de.littleprogrammer.marketplace.database.Database;
-import net.md_5.bungee.api.ChatColor;
+import de.littleprogrammer.marketplace.files.LanguageFile;
+import de.littleprogrammer.marketplace.guis.MarketPlaceGUI;
 import org.bson.Document;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,18 +14,20 @@ import java.util.List;
 public class MarketPlaceCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
+        LanguageFile languageFile = new LanguageFile();
 
         if (!(commandSender instanceof Player)) {
-            commandSender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+            commandSender.sendMessage(languageFile.getString("command.notAPlayer"));
         }
         Player player = (Player) commandSender;
 
         if (!player.hasPermission("marketplace.view")) {
-            player.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+            player.sendMessage(languageFile.getString("command.noPermission"));
             return false;
         }
 
         List<Document> items = new Database().getAllItems();
+        new MarketPlaceGUI(player, items, false);
         System.out.println(items);
 
         return false;

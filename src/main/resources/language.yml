@@ -1,0 +1,14 @@
+# You can use ChatColors as seen here: https://www.spigotmc.org/attachments/example2-png.188806/
+command:
+  notAPlayer: "&cYou must be a player to use this command!"
+  noPermission: "&cYou don't have permission to use this command!"
+  sell:
+    usage: "&cUsage: /sell <price>"
+    noItem: "&cYou are not holding an item!"
+    success: "&aYou listed your item on the marketplace"
+
+guis:
+  marketplace:
+    title: "&8Marketplace"
+    # You can use the %price% placeholder here. It will be replaced with the price of the listing on redering
+    lore: "Buy for $%price%"

@@ -1,11 +1,15 @@
 package de.littleprogrammer.marketplace.utils;
 
+import de.littleprogrammer.marketplace.Main;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -37,5 +41,23 @@ public class ItemUtils {
             throw new RuntimeException("Failed to convert bas64 to a valid itemStack", exception);
         }
     }
+
+    public static String getPdc(ItemStack itemStack) {
+        NamespacedKey key = new NamespacedKey(Main.getInstance(), "localizedName");
+
+        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        return (pdc.has(key, PersistentDataType.STRING) ? pdc.get(key, PersistentDataType.STRING) : "");
+    }
+
+    public static ItemStack setPdc(ItemStack itemStack, String name) {
+        NamespacedKey key = new NamespacedKey(Main.getInstance(), "localizedName");
+        ItemMeta meta = itemStack.getItemMeta();
+
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        pdc.set(key, PersistentDataType.STRING, name);
+        itemStack.setItemMeta(meta);
+        return itemStack;
+    }
+
 
 }
