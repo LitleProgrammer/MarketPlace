@@ -11,9 +11,9 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class MarketPlaceCommand implements CommandExecutor {
+public class BlackMarketCommand implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
+    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         LanguageFile languageFile = new LanguageFile();
 
         if (!(commandSender instanceof Player)) {
@@ -21,13 +21,13 @@ public class MarketPlaceCommand implements CommandExecutor {
         }
         Player player = (Player) commandSender;
 
-        if (!player.hasPermission("marketplace.view")) {
+        if (!player.hasPermission("marketplace.blackmarket")) {
             player.sendMessage(languageFile.getString("command.noPermission"));
             return false;
         }
 
         List<Document> items = new Database().getAllItems();
-        new MarketPlaceGUI(player, items, false);
+        new MarketPlaceGUI(player, items, true);
 
         return false;
     }

@@ -53,10 +53,21 @@ public class RedisManager {
         }
     }
 
+    public void lrem(String key, String value) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.lrem(key, 0, value);
+        }
+    }
+
+    public void del(String key) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.del(key);
+        }
+    }
+
     public List<String> lrange(String key, long start, long end) {
         try (Jedis jedis = jedisPool.getResource()) {
             return jedis.lrange(key, start, end);
         }
-
     }
 }

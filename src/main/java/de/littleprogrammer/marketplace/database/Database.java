@@ -91,6 +91,13 @@ public class Database {
         }
     }
 
+    public void removeItem(UUID uuid) {
+        itemsCollection.deleteOne(new Document("itemID", uuid.toString()));
+
+        RedisManager.getInstance().lrem("marketplace:items", uuid.toString());
+        RedisManager.getInstance().del("marketplace:items:" + uuid.toString());
+    }
+
 
 
 

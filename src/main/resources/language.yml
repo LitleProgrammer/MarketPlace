@@ -7,8 +7,15 @@ command:
     noItem: "&cYou are not holding an item!"
     success: "&aYou listed your item on the marketplace"
 
+messages:
+  # You can use the %price% placeholder here. It will be replaced with the price of the listing on redering
+  sellerNotification: "&a%player% bought you item on the marketplace you earned $%price%"
+  buyerNotification: "&aYou bought the item from %player% the marketplace for $%price%"
+  cannotBuyOwn: "&aYou can not buy your own items!"
+
 guis:
   marketplace:
     title: "&8Marketplace"
+    blackMarket: "&0BlackMarket"
     # You can use the %price% placeholder here. It will be replaced with the price of the listing on redering
     lore: "Buy for $%price%"

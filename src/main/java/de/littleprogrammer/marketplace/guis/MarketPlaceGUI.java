@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class MarketPlaceGUI {
@@ -28,10 +29,19 @@ public class MarketPlaceGUI {
     }
 
     private void openGUI() {
-        Inventory inv = Bukkit.createInventory(null, 54, languageFile.getString("guis.marketplace.title"));
+        Inventory inv = Bukkit.createInventory(null, 54, (blackMarket ? languageFile.getString("guis.marketplace.blackMarket") : languageFile.getString("guis.marketplace.title")));
 
         for (Document item : items) {
-            int price = item.getInteger("price");
+            /*int num = new Random().nextInt(2);
+            boolean show = num > 0;
+            System.out.println(num + " " + show);*/
+            if (blackMarket && new Random().nextBoolean()) {
+                //Skip this item if black market is on and 50/50 chance is right
+                continue;
+            }
+
+            // Twice as much whn blackmarket
+            int price = (blackMarket ? item.getInteger("price") / 2 : item.getInteger("price"));
             UUID seller = UUID.fromString(item.getString("seller"));
             ItemStack stack = ItemUtils.deserializeItem(item.getString("item"));
 
@@ -44,7 +54,7 @@ public class MarketPlaceGUI {
             meta.setLore(lore);
             stack.setItemMeta(meta);
 
-            ItemUtils.setPdc(stack, "marketplaceItem:" + price + ":" + seller.toString());
+            ItemUtils.setPdc(stack, "marketplaceItem:" + price + ":" + seller.toString() + ":" + item.getString("itemID") + ":" + (blackMarket ? "blackmarket" : ""));
             inv.addItem(stack);
         }
 

@@ -1,0 +1,2 @@
+# If set to false it only displays the messages and doesn't add or subtract anything
+useVault: false
