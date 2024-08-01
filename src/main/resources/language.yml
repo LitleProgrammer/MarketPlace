@@ -18,6 +18,10 @@ messages:
     sold: "&7You &asold &3%itemName%&7 to &3%player%&7 for &3$%price%&7 on &3%date%&7 at the &3%market%!"
     noTransactions: "&cCouldn't find your transactions or you don't have any."
 
+discord:
+  title: ""
+
+
 guis:
   marketplace:
     title: "&8Marketplace"
