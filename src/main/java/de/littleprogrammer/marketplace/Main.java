@@ -3,6 +3,7 @@ package de.littleprogrammer.marketplace;
 import de.littleprogrammer.marketplace.commands.BlackMarketCommand;
 import de.littleprogrammer.marketplace.commands.MarketPlaceCommand;
 import de.littleprogrammer.marketplace.commands.SellCommand;
+import de.littleprogrammer.marketplace.commands.TransactionsCommand;
 import de.littleprogrammer.marketplace.listeners.InventoryClickListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -25,6 +26,7 @@ public final class Main extends JavaPlugin {
         getCommand("sell").setExecutor(new SellCommand());
         getCommand("marketplace").setExecutor(new MarketPlaceCommand());
         getCommand("blackmarket").setExecutor(new BlackMarketCommand());
+        getCommand("transactions").setExecutor(new TransactionsCommand());
 
         //Listeners
         Bukkit.getPluginManager().registerEvents(new InventoryClickListener(), this);

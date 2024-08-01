@@ -17,3 +17,6 @@ commands:
   blackmarket:
     description: Generates a new shop from the /marketplace menu with 50% discounted prices from a selection of random items. Reimburse the seller 2x if their item is sold on the black market.
     permission: marketplace.blackmarket
+  transactions:
+    description: Displays the player's transaction history.
+    permission: marketplace.history

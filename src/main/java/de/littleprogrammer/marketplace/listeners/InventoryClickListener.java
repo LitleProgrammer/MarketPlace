@@ -1,6 +1,7 @@
 package de.littleprogrammer.marketplace.listeners;
 
 import de.littleprogrammer.marketplace.database.Database;
+import de.littleprogrammer.marketplace.database.DatabaseTransaction;
 import de.littleprogrammer.marketplace.files.ConfigFile;
 import de.littleprogrammer.marketplace.files.LanguageFile;
 import de.littleprogrammer.marketplace.utils.ItemUtils;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,11 +58,14 @@ public class InventoryClickListener implements Listener {
             if (new ConfigFile().getBoolean("useVault")) {
                 VaultHandler.removeBalance(player, price);
             }
-            new Database().removeItem(itemID);
+            Database database = new Database();
+            database.removeItem(itemID);
+            database.addTransaction(new DatabaseTransaction(price, player.getUniqueId(), sellerUUID, event.getCurrentItem(), new Date(), blackMarket));
 
             player.sendMessage(languageFile.getInsertedString("messages.buyerNotification", "%player%", Bukkit.getOfflinePlayer(sellerUUID).getName(), "%price%", price));
             player.closeInventory();
             player.getInventory().addItem(reforamtItem(event.getCurrentItem()));
+
             System.out.println("Click: " + localizedName);
         }
         if (localizedName.contains("fillItem")) {
