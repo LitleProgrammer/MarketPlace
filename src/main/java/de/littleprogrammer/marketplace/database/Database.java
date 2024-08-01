@@ -107,8 +107,8 @@ public class Database {
         UUID transactionID = UUID.randomUUID();
         Document document = new Document("transactionID", transactionID.toString())
                 .append("price", transaction.getPrice())
-                .append("buyer", transaction.getBuyer())
-                .append("seller", transaction.getSeller())
+                .append("buyer", transaction.getBuyer().toString())
+                .append("seller", transaction.getSeller().toString())
                 .append("date", transaction.getDate())
                 .append("item", ItemUtils.serializeItem(transaction.getItem()))
                 .append("blackMarket", transaction.isBlackMarket());

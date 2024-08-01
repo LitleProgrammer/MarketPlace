@@ -23,6 +23,11 @@ public class LanguageFile {
             System.out.println("The amount of items in the list is not even. Please check for message: " + path);
         }
 
+        if (builder.isEmpty()) {
+            System.out.println("The message is null. Please check for message: " + path);
+            return null;
+        }
+
         for (int i = 0; i < placeholdersAndValues.length; i += 2) {
             String placeholder = String.valueOf(placeholdersAndValues[i]);
             String value = String.valueOf(placeholdersAndValues[i + 1]);

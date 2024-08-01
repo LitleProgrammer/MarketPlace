@@ -32,7 +32,7 @@ public class TransactionsCommand implements CommandExecutor {
         player.sendMessage(ChatColor.DARK_GRAY + "-----------------------------------");
         if (!transactions.isEmpty()) {
             for (DatabaseTransaction transaction : transactions) {
-                if (transaction.getBuyer() == player.getUniqueId()) {
+                if (transaction.getBuyer().toString().equals(player.getUniqueId().toString())) {
                     OfflinePlayer seller = Bukkit.getOfflinePlayer(transaction.getSeller());
                     player.sendMessage(languageFile.getInsertedString("messages.transactionLog.bought", "%itemName%", transaction.getItem().getType().toString(), "%player%", seller.getName(), "%price%", transaction.getPrice(), "%date%", transaction.getDate().toString(), "%market%", (transaction.isBlackMarket() ? "black-market" : "normal market")));
                 } else {
