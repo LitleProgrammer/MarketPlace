@@ -1,7 +1,9 @@
 # If set to false it only displays the messages and doesn't add or subtract anything
 useVault: false
 discord:
+  # If you don't want to use the discord integration just leave it empty
   webhookURL: "https://discord.com/api/webhooks/1268600822867165325/JSuVk9bg0j7Ksm1Z9H78ib4f1XfK9qXXtMMzl1kgifnMqrxy1h3EXN6qgCOhJ835TJx2"
-  iconURL: ""
+  iconURL: "https://github.com/LitleProgrammer/logoImages/blob/main/Design%20ohne%20Titel.png?raw=true"
+  username: "Marketplace"
   # As hexadecimal color code
-  color: "#5fc0d4"
+  color: "#64BDA8"

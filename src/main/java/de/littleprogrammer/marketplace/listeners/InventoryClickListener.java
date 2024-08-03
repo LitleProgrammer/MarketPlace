@@ -4,6 +4,8 @@ import de.littleprogrammer.marketplace.database.Database;
 import de.littleprogrammer.marketplace.database.DatabaseTransaction;
 import de.littleprogrammer.marketplace.files.ConfigFile;
 import de.littleprogrammer.marketplace.files.LanguageFile;
+import de.littleprogrammer.marketplace.guis.ConfirmPurchaseGUI;
+import de.littleprogrammer.marketplace.utils.DiscordWebhookUtils;
 import de.littleprogrammer.marketplace.utils.ItemUtils;
 import de.littleprogrammer.marketplace.vault.VaultHandler;
 import org.bukkit.Bukkit;
@@ -15,6 +17,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.awt.*;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +36,17 @@ public class InventoryClickListener implements Listener {
 
         String localizedName = ItemUtils.getPdc(clicked);
         if (localizedName.contains("marketplaceItem")) {
+            event.setCancelled(true);
+            new ConfirmPurchaseGUI(player, clicked);
+            return;
+        }
+
+        if (localizedName.contains("fillItem")) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (localizedName.contains("acceptPurchase")) {
             event.setCancelled(true);
 
             String[] cutName = localizedName.split(":");
@@ -58,20 +73,25 @@ public class InventoryClickListener implements Listener {
             if (new ConfigFile().getBoolean("useVault")) {
                 VaultHandler.removeBalance(player, price);
             }
+
+            ItemStack soldItem = event.getInventory().getItem(13);
+
+            DatabaseTransaction transaction = new DatabaseTransaction(price, player.getUniqueId(), sellerUUID, soldItem, new Date(), blackMarket);
             Database database = new Database();
             database.removeItem(itemID);
-            database.addTransaction(new DatabaseTransaction(price, player.getUniqueId(), sellerUUID, event.getCurrentItem(), new Date(), blackMarket));
+            database.addTransaction(transaction);
 
             player.sendMessage(languageFile.getInsertedString("messages.buyerNotification", "%player%", Bukkit.getOfflinePlayer(sellerUUID).getName(), "%price%", price));
             player.closeInventory();
-            player.getInventory().addItem(reforamtItem(event.getCurrentItem()));
+            player.getInventory().addItem(reforamtItem(soldItem));
 
-            System.out.println("Click: " + localizedName);
+            notifyDiscord(transaction);
         }
-        if (localizedName.contains("fillItem")) {
+
+        if (localizedName.contains("leavePurchase")) {
             event.setCancelled(true);
-            return;
         }
+
 
     }
 
@@ -84,5 +104,39 @@ public class InventoryClickListener implements Listener {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    private void notifyDiscord(DatabaseTransaction databaseTransaction) {
+        ConfigFile configFile = new ConfigFile();
+        LanguageFile languageFile = new LanguageFile();
+
+        if (configFile.getString("discord.webhookURL") != null && !configFile.getString("discord.webhookURL").isEmpty()) {
+            String url = configFile.getString("discord.webhookURL");
+            String iconURL = configFile.getString("discord.iconURL");
+            String username = configFile.getString("discord.username");
+            String colorHex = configFile.getString("discord.color");
+
+            System.out.println("Seinding webhook to: " + url + "    " + iconURL + "    " + username + "    " + colorHex);
+
+            try {
+                new DiscordWebhookUtils(url)
+                        .setAvatarUrl(iconURL)
+                        .setUsername(username)
+                        .setTts(false)
+                        .addEmbed(new DiscordWebhookUtils.EmbedObject()
+                                .setTitle(languageFile.getString("discord.title"))
+                                .setDescription(languageFile.getString("discord.description"))
+                                .setColor(Color.decode(colorHex))
+                                .addField(languageFile.getString("discord.fields.buyerFieldTitle"), Bukkit.getOfflinePlayer(databaseTransaction.getBuyer()).getName(), true)
+                                .addField(languageFile.getString("discord.fields.sellerFieldTitle"), Bukkit.getOfflinePlayer(databaseTransaction.getSeller()).getName(), true)
+                                .addField(languageFile.getString("discord.fields.itemFieldTitle"), databaseTransaction.getItem().getType().toString(), true)
+                                .addField(languageFile.getString("discord.fields.priceFieldTitle"), "$" + String.valueOf(databaseTransaction.getPrice()), true)
+                                .setFooter("Marketplace plugin ● " + databaseTransaction.getDate().toString(), ""))
+                        .execute();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 }
