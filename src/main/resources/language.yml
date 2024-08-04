@@ -12,6 +12,7 @@ messages:
   sellerNotification: "&a%player% bought you item on the marketplace you earned $%price%"
   buyerNotification: "&aYou bought the item from %player% the marketplace for $%price%"
   cannotBuyOwn: "&aYou can not buy your own items!"
+  couldntFind: "&aCouldn't find the item you tried to purchase. Try again later."
   transactionLog:
     # You can use the %itemName%, %player%, %price%, %date% and %market% placeholder here. It will be replaced with the price of the listing on redering
     bought: "&7You &cbought &3%itemName%&7 from &3%player%&7 for &3$%price%&7 on &3%date%&7 from the &3%market%!"

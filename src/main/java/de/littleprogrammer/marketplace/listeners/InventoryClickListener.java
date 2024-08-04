@@ -5,6 +5,7 @@ import de.littleprogrammer.marketplace.database.DatabaseTransaction;
 import de.littleprogrammer.marketplace.files.ConfigFile;
 import de.littleprogrammer.marketplace.files.LanguageFile;
 import de.littleprogrammer.marketplace.guis.ConfirmPurchaseGUI;
+import de.littleprogrammer.marketplace.guis.MarketPlaceGUI;
 import de.littleprogrammer.marketplace.utils.DiscordWebhookUtils;
 import de.littleprogrammer.marketplace.utils.ItemUtils;
 import de.littleprogrammer.marketplace.vault.VaultHandler;
@@ -64,6 +65,12 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
+            Database database = new Database();
+            if (database.getItem(itemID) == null) {
+                player.sendMessage(languageFile.getString("messages.couldntFind"));
+                return;
+            }
+
             Player seller = Bukkit.getPlayer(sellerUUID);
             if (seller != null) {
                 if (new ConfigFile().getBoolean("useVault")) {
@@ -79,7 +86,6 @@ public class InventoryClickListener implements Listener {
             }
 
             DatabaseTransaction transaction = new DatabaseTransaction(price, player.getUniqueId(), sellerUUID, soldItem, new Date(), blackMarket);
-            Database database = new Database();
             database.removeItem(itemID);
             database.addTransaction(transaction);
 
@@ -92,6 +98,7 @@ public class InventoryClickListener implements Listener {
 
         if (localizedName.contains("leavePurchase")) {
             event.setCancelled(true);
+            player.closeInventory();
         }
 
 

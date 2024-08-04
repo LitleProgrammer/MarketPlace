@@ -234,7 +234,7 @@ public class PagedInv implements Listener {
             String input = ItemUtils.getPdc(item);
             UUID uuid = UUID.fromString(input.split(":")[1]);
             PagedInv pagedInv = Main.getInstance().getPagedInv(uuid);
-            player.openInventory(pagedInv.prevPage());
+            InvUtils.switchInv(pagedInv.nextPage(), player);
         }
     }
 }

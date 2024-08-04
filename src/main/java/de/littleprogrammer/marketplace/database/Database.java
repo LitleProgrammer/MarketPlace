@@ -57,8 +57,23 @@ public class Database {
         redisManager.lpush("marketplace:items", itemID.toString());
     }
 
-    public void getItem(UUID uuid) {
+    public Document getItem(UUID uuid) {
+        RedisManager redisManager = RedisManager.getInstance();
 
+        String item = redisManager.get("marketplace:items:" + uuid.toString());
+        if (item != null) {
+            Document document = Document.parse(item);
+            return document;
+        }
+
+        MongoCursor<Document> cursor = itemsCollection.find(Filters.eq("itemID", uuid.toString())).cursor();
+        if (cursor.hasNext()) {
+            Document document = Document.parse(cursor.next().toJson());
+            redisManager.set("marketplace:items:" + uuid.toString(), document.toString());
+            return document;
+        }
+
+        return null;
     }
 
     public List<Document> getAllItems() {
