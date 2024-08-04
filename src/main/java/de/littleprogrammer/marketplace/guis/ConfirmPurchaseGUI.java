@@ -16,7 +16,36 @@ public class ConfirmPurchaseGUI {
 
         Inventory inv = Bukkit.createInventory(null, 27, languageFile.getString("guis.confirmation.title"));
         for (int i = 0; i < 27; i++) {
-            if (i % 9 < 4 && i % 9 > 0) {
+            if (i % 9 > 5) {
+                //Red
+                ItemStack redPane = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+                ItemMeta redMeta = redPane.getItemMeta();
+                redMeta.setDisplayName(languageFile.getString("guis.confirmation.leave"));
+                redPane.setItemMeta(redMeta);
+                ItemUtils.setPdc(redPane, "leavePurchase");
+
+                inv.setItem(i, redPane);
+                continue;
+            }
+
+            if (i == 13) {
+                inv.setItem(i, item);
+                continue;
+            }
+
+            if (i % 9 > 2) {
+                //Gray
+                ItemStack grayPane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+                ItemMeta grayMeta = grayPane.getItemMeta();
+                grayMeta.setDisplayName(" ");
+                grayPane.setItemMeta(grayMeta);
+                ItemUtils.setPdc(grayPane, "fillItem");
+
+                inv.setItem(i, grayPane);
+                continue;
+            }
+
+            if (i % 9 < 3) {
                 //Green
                 ItemStack greenPane = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
                 ItemMeta greenMeta = greenPane.getItemMeta();
@@ -25,26 +54,6 @@ public class ConfirmPurchaseGUI {
                 ItemUtils.setPdc(greenPane, "acceptPurchase");
 
                 inv.setItem(i, greenPane);
-            } else if (i == 13) {
-                inv.setItem(i, item);
-            } else if (i % 9 < 7 && i % 9 > 3) {
-                //Gray
-                ItemStack grayPane = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-                ItemMeta grayMeta = grayPane.getItemMeta();
-                grayMeta.setDisplayName(" ");
-                grayPane.setItemMeta(grayMeta);
-                ItemUtils.setPdc(grayPane, "fillItem");
-
-                inv.setItem(i, grayPane);
-            } else if (i % 9 > 6) {
-                //Red
-                ItemStack redPane = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-                ItemMeta redMeta = redPane.getItemMeta();
-                redMeta.setDisplayName(languageFile.getString("guis.confirmation.buy"));
-                redPane.setItemMeta(redMeta);
-                ItemUtils.setPdc(redPane, "leavePurchase");
-
-                inv.setItem(i, redPane);
             }
         }
 

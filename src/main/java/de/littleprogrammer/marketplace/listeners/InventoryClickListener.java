@@ -49,11 +49,15 @@ public class InventoryClickListener implements Listener {
         if (localizedName.contains("acceptPurchase")) {
             event.setCancelled(true);
 
-            String[] cutName = localizedName.split(":");
+            ItemStack soldItem = event.getInventory().getItem(13);
+            String soldItemLocalizedName = ItemUtils.getPdc(soldItem);
+
+
+            String[] cutName = soldItemLocalizedName.split(":");
             int price = Integer.parseInt(cutName[1]);
             UUID sellerUUID = UUID.fromString(cutName[2]);
             UUID itemID = UUID.fromString(cutName[3]);
-            boolean blackMarket = localizedName.contains("blackmarket");
+            boolean blackMarket = soldItemLocalizedName.contains("blackmarket");
 
             if (sellerUUID.equals(player.getUniqueId())) {
                 player.sendMessage(languageFile.getString("messages.cannotBuyOwn"));
@@ -73,8 +77,6 @@ public class InventoryClickListener implements Listener {
             if (new ConfigFile().getBoolean("useVault")) {
                 VaultHandler.removeBalance(player, price);
             }
-
-            ItemStack soldItem = event.getInventory().getItem(13);
 
             DatabaseTransaction transaction = new DatabaseTransaction(price, player.getUniqueId(), sellerUUID, soldItem, new Date(), blackMarket);
             Database database = new Database();
@@ -103,7 +105,8 @@ public class InventoryClickListener implements Listener {
         }
         meta.setLore(lore);
         item.setItemMeta(meta);
-        return item;
+
+        return ItemUtils.removePdc(item);
     }
 
     private void notifyDiscord(DatabaseTransaction databaseTransaction) {

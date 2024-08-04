@@ -5,17 +5,23 @@ import de.littleprogrammer.marketplace.commands.MarketPlaceCommand;
 import de.littleprogrammer.marketplace.commands.SellCommand;
 import de.littleprogrammer.marketplace.commands.TransactionsCommand;
 import de.littleprogrammer.marketplace.listeners.InventoryClickListener;
+import de.littleprogrammer.marketplace.utils.PagedInv;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.UUID;
 
 public final class Main extends JavaPlugin {
 
     private static Main instance;
     private static Economy economy = null;
+
+    // Storing <playerUUID, pagedInv>
+    private HashMap<UUID, PagedInv> pagedInvs = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -30,6 +36,7 @@ public final class Main extends JavaPlugin {
 
         //Listeners
         Bukkit.getPluginManager().registerEvents(new InventoryClickListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PagedInv(), this);
 
         //Files
         File databaseConfig = new File(getDataFolder(), "database.yml");
@@ -77,5 +84,17 @@ public final class Main extends JavaPlugin {
 
     public Economy getEconomy() {
         return economy;
+    }
+
+    public PagedInv getPagedInv(UUID uuid) {
+        return pagedInvs.get(uuid);
+    }
+
+    public void addPagedInv(UUID uuid, PagedInv pagedInv) {
+        pagedInvs.put(uuid, pagedInv);
+    }
+
+    public void removePagedInv(UUID uuid) {
+        pagedInvs.remove(uuid);
     }
 }

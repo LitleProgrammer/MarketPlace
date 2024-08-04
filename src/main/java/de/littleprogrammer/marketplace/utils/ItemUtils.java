@@ -43,10 +43,28 @@ public class ItemUtils {
     }
 
     public static String getPdc(ItemStack itemStack) {
-        NamespacedKey key = new NamespacedKey(Main.getInstance(), "localizedName");
+        if (itemStack != null && itemStack.hasItemMeta()) {
+            NamespacedKey key = new NamespacedKey(Main.getInstance(), "localizedName");
 
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
-        return (pdc.has(key, PersistentDataType.STRING) ? pdc.get(key, PersistentDataType.STRING) : "");
+            PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+            return (pdc.has(key, PersistentDataType.STRING) ? pdc.get(key, PersistentDataType.STRING) : "");
+        }
+        return "";
+    }
+
+    public static ItemStack removePdc(ItemStack itemStack) {
+        if (itemStack != null && itemStack.hasItemMeta()) {
+            NamespacedKey key = new NamespacedKey(Main.getInstance(), "localizedName");
+
+            ItemMeta meta = itemStack.getItemMeta();
+            PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            if (pdc.has(key, PersistentDataType.STRING)) {
+                pdc.remove(key);
+                itemStack.setItemMeta(meta);
+                return itemStack;
+            }
+        }
+        return itemStack;
     }
 
     public static ItemStack setPdc(ItemStack itemStack, String name) {

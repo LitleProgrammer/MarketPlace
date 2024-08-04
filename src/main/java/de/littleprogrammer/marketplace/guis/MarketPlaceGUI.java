@@ -2,6 +2,7 @@ package de.littleprogrammer.marketplace.guis;
 
 import de.littleprogrammer.marketplace.files.LanguageFile;
 import de.littleprogrammer.marketplace.utils.ItemUtils;
+import de.littleprogrammer.marketplace.utils.PagedInv;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,7 +30,7 @@ public class MarketPlaceGUI {
     }
 
     private void openGUI() {
-        Inventory inv = Bukkit.createInventory(null, 54, (blackMarket ? languageFile.getString("guis.marketplace.blackMarket") : languageFile.getString("guis.marketplace.title")));
+        List<ItemStack> itemStacks = new ArrayList<>();
 
         for (Document item : items) {
             /*int num = new Random().nextInt(2);
@@ -55,10 +56,12 @@ public class MarketPlaceGUI {
             stack.setItemMeta(meta);
 
             ItemUtils.setPdc(stack, "marketplaceItem:" + price + ":" + seller.toString() + ":" + item.getString("itemID") + ":" + (blackMarket ? "blackmarket" : ""));
-            inv.addItem(stack);
+            itemStacks.add(stack);
         }
 
-        player.openInventory(inv);
+        Inventory pagedInv = new PagedInv().buildPagedInv(0, itemStacks, new int[]{9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ,21 ,22 ,23 ,24 ,25 ,26 ,27 ,28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44}, 4, (blackMarket ? languageFile.getString("guis.marketplace.blackMarket") : languageFile.getString("guis.marketplace.title")), true, player.getUniqueId(),null);
+
+        player.openInventory(pagedInv);
     }
 
 }

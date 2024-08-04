@@ -30,8 +30,8 @@ discord:
 
 guis:
   marketplace:
-    title: "&8Marketplace"
-    blackMarket: "&0BlackMarket"
+    title: "&8Marketplace | Page:"
+    blackMarket: "&0BlackMarket | Page:"
     # You can use the %price% placeholder here. It will be replaced with the price of the listing on redering
     lore: "Buy for $%price%"
   confirmation:
