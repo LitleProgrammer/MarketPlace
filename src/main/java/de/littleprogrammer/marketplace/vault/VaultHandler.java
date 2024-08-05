@@ -12,4 +12,8 @@ public class VaultHandler {
     public static void removeBalance(Player player, double money) {
         Main.getInstance().getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()), money);
     }
+
+    public static boolean hasBalance(Player player, double money) {
+        return Main.getInstance().getEconomy().getBalance(player) >= money;
+    }
 }

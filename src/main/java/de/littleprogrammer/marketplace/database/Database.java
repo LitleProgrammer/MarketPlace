@@ -117,7 +117,7 @@ public class Database {
         RedisManager.getInstance().del("marketplace:items:" + uuid.toString());
     }
 
-    public void addTransaction(DatabaseTransaction transaction) {
+    public void addTransaction(DatabaseTransaction transaction) throws Exception {
         RedisManager redisManager = RedisManager.getInstance();
         UUID transactionID = UUID.randomUUID();
         Document document = new Document("transactionID", transactionID.toString())
@@ -128,48 +128,20 @@ public class Database {
                 .append("item", ItemUtils.serializeItem(transaction.getItem()))
                 .append("blackMarket", transaction.isBlackMarket());
 
-        transactionsCollection.insertOne(document);
+        try (ClientSession session = mongoClient.startSession()) {
+            session.startTransaction();
+            transactionsCollection.insertOne(session, document);
 
-        DatabasePlayer databaseBuyer = getPlayerByUUID(UUID.fromString(transaction.getBuyer().toString()));
-        if (databaseBuyer != null) {
-            List<String> transactions = databaseBuyer.getHistory() != null ? databaseBuyer.getHistory() : new ArrayList<>();
-            transactions.add(transactionID.toString());
-            Bson updates = Updates.combine(
-                    Updates.set("history", transactions));
-            UpdateOptions options = new UpdateOptions().upsert(true);
-            playersCollection.updateOne(Filters.eq("playerID", databaseBuyer.getUuid().toString()), updates, options);
+            updatePlayerHistory(session, transaction.getBuyer(), transactionID);
+            updatePlayerHistory(session, transaction.getSeller(), transactionID);
 
-            Document buyerDoc = new Document("playerID", databaseBuyer.getUuid().toString())
-                    .append("history", transactions);
+            session.commitTransaction();
 
-            redisManager.set("marketplace:players:" + databaseBuyer.getUuid().toString(), buyerDoc.toJson());
-        } else {
-            List<String> transactions = new ArrayList<>();
-            transactions.add(transactionID.toString());
-            addPlayer(new DatabasePlayer(transaction.getBuyer(), transactions));
+            redisManager.set("marketplace:transactions:" + transactionID, document.toJson());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error while adding transaction");
         }
-
-        DatabasePlayer databaseSeller = getPlayerByUUID(UUID.fromString(transaction.getSeller().toString()));
-        if (databaseSeller != null) {
-            List<String> transactions = databaseSeller.getHistory() != null ? databaseSeller.getHistory() : new ArrayList<>();
-            transactions.add(transactionID.toString());
-            Bson updates = Updates.combine(
-                    Updates.set("history", transactions));
-            UpdateOptions options = new UpdateOptions().upsert(true);
-            playersCollection.updateOne(Filters.eq("playerID", databaseSeller.getUuid().toString()), updates, options);
-
-            Document sellerDoc = new Document("playerID", databaseSeller.getUuid().toString())
-                    .append("history", transactions);
-
-            redisManager.set("marketplace:players:" + databaseSeller.getUuid().toString(), sellerDoc.toJson());
-        } else {
-            List<String> transactions = new ArrayList<>();
-            transactions.add(transactionID.toString());
-            addPlayer(new DatabasePlayer(transaction.getSeller(), transactions));
-        }
-
-
-        redisManager.set("marketplace:transactions:" + transactionID, document.toJson());
     }
 
     public DatabaseTransaction getTransaction(UUID transactionID) {
@@ -221,17 +193,50 @@ public class Database {
         }
     }
 
-    public void addPlayer(DatabasePlayer databasePlayer) {
+    public void addPlayer(ClientSession session, DatabasePlayer databasePlayer) throws Exception {
         Document playerDoc = new Document("playerID", databasePlayer.getUuid().toString())
                 .append("history", databasePlayer.getHistory());
 
-        playersCollection.insertOne(playerDoc);
+        try {
+            playersCollection.insertOne(session, playerDoc);
 
-        RedisManager redisManager = RedisManager.getInstance();
-        redisManager.set("marketplace:players:" + databasePlayer.getUuid().toString(), playerDoc.toJson());
+            RedisManager redisManager = RedisManager.getInstance();
+            redisManager.set("marketplace:players:" + databasePlayer.getUuid().toString(), playerDoc.toJson());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error while adding player");
+        }
     }
 
+    private void updatePlayerHistory(ClientSession session, UUID playerUUID, UUID transactionID) throws Exception {
+        DatabasePlayer databasePlayer = getPlayerByUUID(playerUUID);
+        if (databasePlayer != null) {
+            List<String> transactions = databasePlayer.getHistory() != null ? databasePlayer.getHistory() : new ArrayList<>();
+            transactions.add(transactionID.toString());
 
+            Bson updates = Updates.set("history", transactions);
+            try {
+                playersCollection.updateOne(session, Filters.eq("playerID", databasePlayer.getUuid().toString()), updates);
+                Document playerDoc = new Document("playerID", databasePlayer.getUuid().toString())
+                        .append("history", transactions);
+
+                RedisManager.getInstance().set("marketplace:players:" + databasePlayer.getUuid().toString(), playerDoc.toJson());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception("Error while updating player history");
+            }
+        } else {
+            List<String> transactions = new ArrayList<>();
+            transactions.add(transactionID.toString());
+
+            try {
+                addPlayer(session, new DatabasePlayer(playerUUID, transactions));
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception("Error while updating player history");
+            }
+        }
+    }
 
     private List<Document> parseJson(String json) {
         List<Document> documents = new ArrayList<>();

@@ -1,8 +1,13 @@
 package de.littleprogrammer.marketplace.listeners;
 
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.TransactionBody;
 import de.littleprogrammer.marketplace.database.Database;
 import de.littleprogrammer.marketplace.database.DatabaseTransaction;
 import de.littleprogrammer.marketplace.files.ConfigFile;
+import de.littleprogrammer.marketplace.files.DatabaseFile;
 import de.littleprogrammer.marketplace.files.LanguageFile;
 import de.littleprogrammer.marketplace.guis.ConfirmPurchaseGUI;
 import de.littleprogrammer.marketplace.guis.MarketPlaceGUI;
@@ -71,29 +76,52 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
-            Player seller = Bukkit.getPlayer(sellerUUID);
-            if (seller != null) {
-                if (new ConfigFile().getBoolean("useVault")) {
-                    VaultHandler.addBalance(seller, (blackMarket ? price * 4: price));
-                }
-                if (seller.isOnline()) {
-                    seller.sendMessage(languageFile.getInsertedString("messages.sellerNotification", "%player%", player.getName(), "%price%", (blackMarket ? price * 4: price)));
-                }
-            }
-
-            if (new ConfigFile().getBoolean("useVault")) {
-                VaultHandler.removeBalance(player, price);
-            }
-
             DatabaseTransaction transaction = new DatabaseTransaction(price, player.getUniqueId(), sellerUUID, soldItem, new Date(), blackMarket);
-            database.removeItem(itemID);
-            database.addTransaction(transaction);
 
-            player.sendMessage(languageFile.getInsertedString("messages.buyerNotification", "%player%", Bukkit.getOfflinePlayer(sellerUUID).getName(), "%price%", price));
-            player.closeInventory();
-            player.getInventory().addItem(reforamtItem(soldItem));
+            try (MongoClient mongoClient = MongoClients.create(new DatabaseFile().getString("mongoDB.uri"))) {
+                ClientSession session = mongoClient.startSession();
+                TransactionBody<String> transactionBody = () -> {
+                    database.removeItem(itemID);
+                    try {
+                        database.addTransaction(transaction);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
 
-            notifyDiscord(transaction);
+                    return "Done transaction";
+                };
+
+                try {
+                    session.withTransaction(transactionBody);
+
+                    if (new ConfigFile().getBoolean("useVault") && VaultHandler.hasBalance(player, price)) {
+                        VaultHandler.removeBalance(player, price);
+
+                        Player seller = Bukkit.getPlayer(sellerUUID);
+                        if (seller != null) {
+                            VaultHandler.addBalance(seller, (blackMarket ? price * 4 : price));
+
+                            if (seller.isOnline()) {
+                                seller.sendMessage(languageFile.getInsertedString("messages.sellerNotification", "%player%", player.getName(), "%price%", (blackMarket ? price * 4 : price)));
+                            }
+                        }
+                    }
+
+                    player.sendMessage(languageFile.getInsertedString("messages.buyerNotification", "%player%", Bukkit.getOfflinePlayer(sellerUUID).getName(), "%price%", price));
+                    player.closeInventory();
+                    player.getInventory().addItem(reforamtItem(soldItem));
+
+                    notifyDiscord(transaction);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    player.sendMessage(languageFile.getString("messages.transactionError"));
+                } finally {
+                    session.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                player.sendMessage(languageFile.getString("messages.transactionError"));
+            }
         }
 
         if (localizedName.contains("leavePurchase")) {
