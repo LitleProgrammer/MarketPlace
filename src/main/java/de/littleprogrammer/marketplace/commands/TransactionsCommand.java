@@ -28,22 +28,28 @@ public class TransactionsCommand implements CommandExecutor {
             return false;
         }
 
-        List<DatabaseTransaction> transactions = new Database().getPlayerTransactions(player.getUniqueId());
-        player.sendMessage(ChatColor.DARK_GRAY + "-----------------------------------");
-        if (!transactions.isEmpty()) {
-            for (DatabaseTransaction transaction : transactions) {
-                if (transaction.getBuyer().toString().equals(player.getUniqueId().toString())) {
-                    OfflinePlayer seller = Bukkit.getOfflinePlayer(transaction.getSeller());
-                    player.sendMessage(languageFile.getInsertedString("messages.transactionLog.bought", "%itemName%", transaction.getItem().getType().toString(), "%player%", seller.getName(), "%price%", transaction.getPrice(), "%date%", transaction.getDate().toString(), "%market%", (transaction.isBlackMarket() ? "black-market" : "normal market")));
-                } else {
-                    OfflinePlayer buyer = Bukkit.getOfflinePlayer(transaction.getBuyer());
-                    player.sendMessage(languageFile.getInsertedString("messages.transactionLog.sold", "%itemName%", transaction.getItem().getType().toString(), "%player%", buyer.getName(), "%price%", transaction.getPrice(), "%date%", transaction.getDate().toString(), "%market%", (transaction.isBlackMarket() ? "black-market" : "normal market")));
+        try {
+            List<DatabaseTransaction> transactions = new Database().getPlayerTransactions(player.getUniqueId());
+
+            player.sendMessage(ChatColor.DARK_GRAY + "-----------------------------------");
+            if (!transactions.isEmpty()) {
+                for (DatabaseTransaction transaction : transactions) {
+                    if (transaction.getBuyer().toString().equals(player.getUniqueId().toString())) {
+                        OfflinePlayer seller = Bukkit.getOfflinePlayer(transaction.getSeller());
+                        player.sendMessage(languageFile.getInsertedString("messages.transactionLog.bought", "%itemName%", transaction.getItem().getType().toString(), "%player%", seller.getName(), "%price%", transaction.getPrice(), "%date%", transaction.getDate().toString(), "%market%", (transaction.isBlackMarket() ? "black-market" : "normal market")));
+                    } else {
+                        OfflinePlayer buyer = Bukkit.getOfflinePlayer(transaction.getBuyer());
+                        player.sendMessage(languageFile.getInsertedString("messages.transactionLog.sold", "%itemName%", transaction.getItem().getType().toString(), "%player%", buyer.getName(), "%price%", transaction.getPrice(), "%date%", transaction.getDate().toString(), "%market%", (transaction.isBlackMarket() ? "black-market" : "normal market")));
+                    }
                 }
+            } else {
+                player.sendMessage(languageFile.getString("messages.transactionLog.noTransactions"));
             }
-        } else {
-            player.sendMessage(languageFile.getString("messages.transactionLog.noTransactions"));
+            player.sendMessage(ChatColor.DARK_GRAY + "-----------------------------------");
+        } catch (Exception e) {
+            e.printStackTrace();
+            player.sendMessage(languageFile.getString("command.errorGeneral"));
         }
-        player.sendMessage(ChatColor.DARK_GRAY + "-----------------------------------");
 
         return false;
     }

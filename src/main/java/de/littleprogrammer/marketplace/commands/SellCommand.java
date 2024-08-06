@@ -2,7 +2,6 @@ package de.littleprogrammer.marketplace.commands;
 
 import de.littleprogrammer.marketplace.database.Database;
 import de.littleprogrammer.marketplace.files.LanguageFile;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -38,9 +37,14 @@ public class SellCommand implements CommandExecutor {
             return false;
         }
 
-        new Database().addItem(item, Integer.parseInt(args[0]), player);
-        player.getInventory().setItemInMainHand(null);
-        player.sendMessage(languageFile.getString("command.sell.success"));
+        try {
+            new Database().addItem(item, Integer.parseInt(args[0]), player);
+
+            player.getInventory().setItemInMainHand(null);
+            player.sendMessage(languageFile.getString("command.sell.success"));
+        } catch (Exception e) {
+            player.sendMessage(languageFile.getString("command.errorGeneral"));
+        }
 
         return false;
     }

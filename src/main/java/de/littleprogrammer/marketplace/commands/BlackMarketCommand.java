@@ -26,8 +26,13 @@ public class BlackMarketCommand implements CommandExecutor {
             return false;
         }
 
-        List<Document> items = new Database().getAllItems();
-        new MarketPlaceGUI(player, items, true);
+        try {
+            List<Document> items = new Database().getAllItems();
+            new MarketPlaceGUI(player, items, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            player.sendMessage(languageFile.getString("command.errorGeneral"));
+        }
 
         return false;
     }

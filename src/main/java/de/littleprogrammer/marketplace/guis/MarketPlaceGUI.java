@@ -4,7 +4,6 @@ import de.littleprogrammer.marketplace.files.LanguageFile;
 import de.littleprogrammer.marketplace.utils.ItemUtils;
 import de.littleprogrammer.marketplace.utils.PagedInv;
 import org.bson.Document;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -33,9 +32,6 @@ public class MarketPlaceGUI {
         List<ItemStack> itemStacks = new ArrayList<>();
 
         for (Document item : items) {
-            /*int num = new Random().nextInt(2);
-            boolean show = num > 0;
-            System.out.println(num + " " + show);*/
             if (blackMarket && new Random().nextBoolean()) {
                 //Skip this item if black market is on and 50/50 chance is right
                 continue;

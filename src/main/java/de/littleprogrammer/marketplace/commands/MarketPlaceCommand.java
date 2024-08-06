@@ -26,8 +26,13 @@ public class MarketPlaceCommand implements CommandExecutor {
             return false;
         }
 
-        List<Document> items = new Database().getAllItems();
-        new MarketPlaceGUI(player, items, false);
+        try {
+            List<Document> items = new Database().getAllItems();
+            new MarketPlaceGUI(player, items, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            player.sendMessage(languageFile.getString("command.errorGeneral"));
+        }
 
         return false;
     }
