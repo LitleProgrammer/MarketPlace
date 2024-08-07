@@ -2,7 +2,8 @@
 useVault: false
 discord:
   # If you don't want to use the discord integration just leave it empty
-  webhookURL: "https://discord.com/api/webhooks/1268600822867165325/JSuVk9bg0j7Ksm1Z9H78ib4f1XfK9qXXtMMzl1kgifnMqrxy1h3EXN6qgCOhJ835TJx2"
+  webhookURL: ""
+  # The image is just a placeholder, you can change it to whatever link to an image you want
   iconURL: "https://github.com/LitleProgrammer/logoImages/blob/main/Design%20ohne%20Titel.png?raw=true"
   username: "Marketplace"
   # As hexadecimal color code
