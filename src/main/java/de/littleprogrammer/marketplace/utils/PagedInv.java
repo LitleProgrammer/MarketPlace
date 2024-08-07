@@ -105,8 +105,7 @@ public class PagedInv implements Listener {
     private Inventory createInv() {
         languageFile = new LanguageFile();
 
-        String pageString = languageFile.getString("common.page");
-        inv = Bukkit.createInventory(null, (borderTop ? ((rows + 2) * 9) : ((rows + 1) * 9)), title + pageString + page);
+        inv = Bukkit.createInventory(null, (borderTop ? ((rows + 2) * 9) : ((rows + 1) * 9)), getGUITitle());
 
         pageItems.clear();
 
@@ -207,6 +206,10 @@ public class PagedInv implements Listener {
         return backItem;
     }
 
+    public String getGUITitle() {
+        return title + page;
+    }
+
 
     @EventHandler
     public void onPlayerInteract(InventoryClickEvent event) {
@@ -225,6 +228,7 @@ public class PagedInv implements Listener {
             UUID uuid = UUID.fromString(input.split(":")[1]);
             PagedInv pagedInv = Main.getInstance().getPagedInv(uuid);
             InvUtils.switchInv(pagedInv.nextPage(), player);
+            player.getOpenInventory().setTitle(pagedInv.getGUITitle());
         }
 
         if (ItemUtils.getPdc(item).contains("pagedInvBack")) {
@@ -234,7 +238,8 @@ public class PagedInv implements Listener {
             String input = ItemUtils.getPdc(item);
             UUID uuid = UUID.fromString(input.split(":")[1]);
             PagedInv pagedInv = Main.getInstance().getPagedInv(uuid);
-            InvUtils.switchInv(pagedInv.nextPage(), player);
+            InvUtils.switchInv(pagedInv.prevPage(), player);
+            player.getOpenInventory().setTitle(pagedInv.getGUITitle());
         }
     }
 }
